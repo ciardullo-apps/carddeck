@@ -94,7 +94,7 @@ void dealCards(int numCards, int numPlayers, struct Card * deck,
   for(int cardNum = 0; cardNum < numCards; cardNum++) {
     struct Card * hand = deck + cardNum;
     for(int playerNum = 0; playerNum < numPlayers; playerNum++) {
-      playerHands[playerNum][cardNum] = nextCard;
+      playerHands[cardNum][playerNum] = nextCard;
       nextCard++;
       // printf("[%c-%s]\n", hand->rank, hand->suit);
     }
@@ -105,7 +105,7 @@ void printPlayerHands(int numCards, int numPlayers, struct Card* playerHands[num
   for(int playerNum = 0; playerNum < numPlayers; playerNum++) {
     printf("Player %d] -\t", playerNum + 1);
     for(int cardNum = 0; cardNum < numCards; cardNum++) {
-      struct Card * card = playerHands[playerNum][cardNum];
+      struct Card * card = playerHands[cardNum][playerNum];
       printf("[%c-%s]\t", card->rank, card->suit);
     }
     printf("\n");
