@@ -86,26 +86,24 @@ void printDeck(struct Card * cards) {
 /*
  * Uses variable length array for the hands containing the dealt cardes
  */
-void dealCards(int numCards, int numPlayers, struct Card * deck,
-  struct Card * playerHands[numCards][numPlayers]) {
+void dealCards(int numPlayers, int numCards, struct Card * deck,
+  struct Card * playerHands[numPlayers][numCards]) {
 
-  struct Card * nextCard = deck;
   /* Initialize a hand for each player */
-  for(int cardNum = 0; cardNum < numCards; cardNum++) {
-    struct Card * hand = deck + cardNum;
-    for(int playerNum = 0; playerNum < numPlayers; playerNum++) {
-      playerHands[cardNum][playerNum] = nextCard;
-      nextCard++;
-      // printf("[%c-%s]\n", hand->rank, hand->suit);
+  for(int playerNum = 0; playerNum < numPlayers; playerNum++) {
+    struct Card * nextCard = deck + playerNum;
+    for(int cardNum = 0; cardNum < numCards; cardNum++) {
+      playerHands[playerNum][cardNum] = nextCard;
+      nextCard += numPlayers;
     }
   }
 }
 
-void printPlayerHands(int numCards, int numPlayers, struct Card* playerHands[numCards][numPlayers]) {
+void printPlayerHands(int numPlayers, int numCards, struct Card* playerHands[numPlayers][numCards]) {
   for(int playerNum = 0; playerNum < numPlayers; playerNum++) {
     printf("Player %d] -\t", playerNum + 1);
     for(int cardNum = 0; cardNum < numCards; cardNum++) {
-      struct Card * card = playerHands[cardNum][playerNum];
+      struct Card * card = playerHands[playerNum][cardNum];
       printf("[%c-%s]\t", card->rank, card->suit);
     }
     printf("\n");
@@ -127,8 +125,8 @@ int main(int argc, char *argv[]) {
   printf("\nRandom Shuffled Deck:\n");
   printDeck(cards);
 
-  struct Card* playerHands[params->numCards][params->numPlayers];
-  dealCards(params->numCards, params->numPlayers, cards, playerHands);
+  struct Card* playerHands[params->numPlayers][params->numCards];
+  dealCards(params->numPlayers, params->numCards, cards, playerHands);
   printf("\nPlayer Hands: (dealt from top/front of deck)\n");
-  printPlayerHands(params->numCards, params->numPlayers, playerHands);
+  printPlayerHands(params->numPlayers, params->numCards, playerHands);
 }
