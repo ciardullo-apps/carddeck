@@ -10,24 +10,31 @@ struct Card * initializeDeck() {
   enum ranks { ACE=1, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING };
   for(int rankNum = ACE; rankNum <= KING; rankNum++ ) {
     char rank;
+    int rankValue;
     switch (rankNum) {
       case ACE:
         rank = ACE_SYMBOL;
+        rankValue = 14;
         break;
       case TEN:
         rank = TEN_SYMBOL;
+        rankValue = 10;
         break;
       case JACK:
         rank = JACK_SYMBOL;
+        rankValue = 11;
         break;
       case QUEEN:
         rank = QUEEN_SYMBOL;
+        rankValue = 12;
         break;
       case KING:
         rank = KING_SYMBOL;
+        rankValue = 13;
         break;
       default:
         rank = rankNum + 48;
+        rankValue = rankNum;
     }
 
     enum suits { HEARTS, DIAMONDS, CLUBS, SPADES };
@@ -35,6 +42,7 @@ struct Card * initializeDeck() {
     for(int suitNum = HEARTS; suitNum <= SPADES; suitNum++) {
       struct Card card;
       card.rank = rank;
+      card.rankValue = rankValue;
 
       // Escape sequences for suits
       switch (suitNum) {
@@ -129,4 +137,19 @@ int main(int argc, char *argv[]) {
   dealCards(params->numPlayers, params->numCards, cards, playerHands);
   printf("\nPlayer Hands: (dealt from top/front of deck)\n");
   printPlayerHands(params->numPlayers, params->numCards, playerHands);
+
+  printf("\nPlayer Hands: sorted\n");
+  sortHands(params->numPlayers, params->numCards, playerHands);
+  printPlayerHands(params->numPlayers, params->numCards, playerHands);
+
+  printf("\nPlayer Hands: ranked\n");
+  rankHands(params->numPlayers, params->numCards, playerHands, -1);
+
+  printf("\nPlayer Hands: winner(s)\n");
+  determineWinner(params->numPlayers, params->numCards, playerHands);
+
+  printf("\nPoker Hands: test\n");
+  struct Card testHands[TEST_HANDS][TEST_CARDS];
+  testRankings(testHands);
+  rankHands(TEST_HANDS, TEST_CARDS, testHands, -1);
 }

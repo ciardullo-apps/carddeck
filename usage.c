@@ -3,10 +3,10 @@
 #include "defs.h"
 #include "functions.h"
 
-const int MIN_CARDS = 1;
-const int MAX_CARDS = 13;
+const int MIN_CARDS = 5;
+const int MAX_CARDS = 5;
 const int MIN_PLAYERS = 1;
-const int MAX_PLAYERS = 13;
+const int MAX_PLAYERS = 10;
 
 void printUsage(char* programName) {
   printf("Usage %s %s %s\n", programName, "<number of cards>", "<number of players>");

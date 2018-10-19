@@ -10,3 +10,9 @@
 #define DIAMOND_SYMBOL "\u25C6"
 #define CLUB_SYMBOL "\u2663"
 #define SPADE_SYMBOL "\u2660"
+
+#define TRUE 1
+#define FALSE 0
+
+#define TEST_HANDS 9
+#define TEST_CARDS 5
