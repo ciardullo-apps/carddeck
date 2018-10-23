@@ -7,62 +7,23 @@
 struct Card * initializeDeck() {
   static struct Card cards[NUM_CARDS_IN_DECK];
   int count = 0;
+
   enum ranks { ACE=1, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING };
+  char rankSymbols[] = { ACE_SYMBOL, '2', '3', '4', '5', '6', '7', '8', '9', TEN_SYMBOL, JACK_SYMBOL, QUEEN_SYMBOL, KING_SYMBOL };
+  int rankValues[] = { 14, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 };
+
+  enum suits { HEARTS, DIAMONDS, CLUBS, SPADES };
+  char* suitSymbols[] = { HEART_SYMBOL, DIAMOND_SYMBOL, CLUB_SYMBOL, SPADE_SYMBOL };
+
   for(int rankNum = ACE; rankNum <= KING; rankNum++ ) {
-    char rank;
-    int rankValue;
-    switch (rankNum) {
-      case ACE:
-        rank = ACE_SYMBOL;
-        rankValue = 14;
-        break;
-      case TEN:
-        rank = TEN_SYMBOL;
-        rankValue = 10;
-        break;
-      case JACK:
-        rank = JACK_SYMBOL;
-        rankValue = 11;
-        break;
-      case QUEEN:
-        rank = QUEEN_SYMBOL;
-        rankValue = 12;
-        break;
-      case KING:
-        rank = KING_SYMBOL;
-        rankValue = 13;
-        break;
-      default:
-        rank = rankNum + 48;
-        rankValue = rankNum;
-    }
-
-    enum suits { HEARTS, DIAMONDS, CLUBS, SPADES };
-
     for(int suitNum = HEARTS; suitNum <= SPADES; suitNum++) {
       struct Card card;
-      card.rank = rank;
-      card.rankValue = rankValue;
-
-      // Escape sequences for suits
-      switch (suitNum) {
-        case HEARTS:
-          card.suit = HEART_SYMBOL;
-          break;
-        case DIAMONDS:
-          card.suit = DIAMOND_SYMBOL;
-          break;
-        case CLUBS:
-          card.suit = CLUB_SYMBOL;
-          break;
-        case SPADES:
-          card.suit = SPADE_SYMBOL;
-          break;
-      }
+      card.rank = rankSymbols[rankNum - 1];
+      card.rankValue = rankValues[rankNum - 1];
+      card.suit = suitSymbols[suitNum];
 
       cards[count++] = card;
     }
-
   }
 
   return cards;
@@ -143,13 +104,13 @@ int main(int argc, char *argv[]) {
   printPlayerHands(params->numPlayers, params->numCards, playerHands);
 
   printf("\nPlayer Hands: ranked\n");
-  rankHands(params->numPlayers, params->numCards, playerHands, -1);
+  rankHands(params->numPlayers, params->numCards, playerHands, NULL);
 
   printf("\nPlayer Hands: winner(s)\n");
   determineWinner(params->numPlayers, params->numCards, playerHands);
 
   printf("\nPoker Hands: test\n");
-  struct Card testHands[TEST_HANDS][TEST_CARDS];
-  testRankings(testHands);
-  rankHands(TEST_HANDS, TEST_CARDS, testHands, -1);
+  // struct Card testHands[TEST_HANDS][TEST_CARDS];
+  // testRankings(testHands);
+  rankHands(TEST_HANDS, TEST_CARDS, testHands, NULL);
 }

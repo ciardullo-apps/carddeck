@@ -5,12 +5,17 @@
 
 int highestValue(int numCards, struct Card playerCards[numCards]);
 int numPairs(int numCards, struct Card playerCards[numCards]);
+int hasOnePair(int numCards, struct Card playerCards[numCards]);
+int hasTwoPairs(int numCards, struct Card playerCards[numCards]);
 int highestDuplicate(int numCards, struct Card playerCards[numCards]);
 int hasTriplet(int numCards, struct Card playerCards[numCards]);
 int hasStraight(int numCards, struct Card playerCards[numCards]);
 int hasFlush(int numCards, struct Card playerCards[numCards]);
 int hasFullHouse(int numCards, struct Card playerCards[numCards]);
 int hasFourOfAKind(int numCards, struct Card playerCards[numCards]);
+void getAllWinningHands(int winner, int numPlayers, int numCards,
+  int winners[numPlayers], enum handRanks winningRank,
+  struct Card playerHands[numPlayers][numCards]);
 
 /* Sort each player hand by rank using Bubble sort */
 void sortHands(int numPlayers, int numCards, struct Card playerHands[numPlayers][numCards]) {
@@ -33,7 +38,7 @@ void sortHands(int numPlayers, int numCards, struct Card playerHands[numPlayers]
 }
 
 void rankHands(int numPlayers, int numCards,
-  struct Card playerHands[numPlayers][numCards], int winner) {
+  struct Card playerHands[numPlayers][numCards], int *winners) {
   for(int playerNum = 0; playerNum < numPlayers; playerNum++) {
     printf("Player %d] -\t", playerNum + 1);
     for(int cardNum = 0; cardNum < numCards; cardNum++) {
@@ -62,8 +67,12 @@ void rankHands(int numPlayers, int numCards,
       printf("- High Card");
     }
 
-    if (playerNum == winner) {
-      printf(" - Winner");
+    if (winners != NULL) {
+      for(int i = 0; i < numPlayers; i++) {
+        if (playerNum == winners[i]) {
+          printf(" - Winner");
+        }
+      }
     }
 
     printf("\n");
@@ -79,6 +88,14 @@ int highestValue(int numCards, struct Card playerCards[numCards]) {
   }
 
   return highestRankValue;
+}
+
+int hasOnePair(int numCards, struct Card playerCards[numCards]) {
+  return numPairs(numCards, playerCards) == 1;
+}
+
+int hasTwoPairs(int numCards, struct Card playerCards[numCards]) {
+  return numPairs(numCards, playerCards) == 2;
 }
 
 int numPairs(int numCards, struct Card playerCards[numCards]) {
@@ -167,136 +184,172 @@ int hasFourOfAKind(int numCards, struct Card playerCards[numCards]) {
 }
 
 void determineWinner(int numPlayers, int numCards, struct Card playerHands[numPlayers][numCards]) {
+  enum handRanks winningRank;
+
   int winner = 0;
   for(int i = 1; i < numPlayers; i++) {
     struct Card *compareToHand = playerHands[i];
     if ((hasStraight(numCards, playerHands[winner]) && hasFlush(numCards, playerHands[winner])) &&
             !(hasStraight(numCards, compareToHand) && hasFlush(numCards, compareToHand))) {
+        winningRank = STRAIGHT_FLUSH;
         continue;
     } else if (!(hasStraight(numCards, playerHands[winner]) && hasFlush(numCards, playerHands[winner])) &&
             (hasStraight(numCards, compareToHand) && hasFlush(numCards, compareToHand))) {
+        winningRank = STRAIGHT_FLUSH;
         winner = i;
     } else if (hasFourOfAKind(numCards, playerHands[winner]) && !hasFourOfAKind(numCards, compareToHand)) {
+        winningRank = FOUR_OF_A_KIND;
         continue;
     } else if (!hasFourOfAKind(numCards, playerHands[winner]) && hasFourOfAKind(numCards, compareToHand)) {
+        winningRank = FOUR_OF_A_KIND;
         winner = i;
     } else if (hasFullHouse(numCards, playerHands[winner]) && !hasFullHouse(numCards, compareToHand)) {
+        winningRank = FULL_HOUSE;
         continue;
     } else if (!hasFullHouse(numCards, playerHands[winner]) && hasFullHouse(numCards, compareToHand)) {
+        winningRank = FULL_HOUSE;
         winner = i;
     } else if (hasFlush(numCards, playerHands[winner]) && !hasFlush(numCards, compareToHand)) {
+        winningRank = FLUSH;
         continue;
     } else if (!hasFlush(numCards, playerHands[winner]) && hasFlush(numCards, compareToHand)) {
+        winningRank = FLUSH;
         winner = i;
     } else if (hasStraight(numCards, playerHands[winner]) && !hasStraight(numCards, compareToHand)) {
+        winningRank = STRAIGHT;
         continue;
     } else if (!hasStraight(numCards, playerHands[winner]) && hasStraight(numCards, compareToHand)) {
+        winningRank = STRAIGHT;
         winner = i;
     } else if (hasTriplet(numCards, playerHands[winner]) && !hasTriplet(numCards, compareToHand)) {
+        winningRank = TRIPLET;
         continue;
     } else if (!hasTriplet(numCards, playerHands[winner]) && hasTriplet(numCards, compareToHand)) {
+        winningRank = TRIPLET;
         winner = i;
-    } else if (numPairs(numCards, playerHands[winner]) > numPairs(numCards, compareToHand)) {
+    } else if (hasTwoPairs(numCards, playerHands[winner]) && !hasTwoPairs(numCards, compareToHand)) {
+        winningRank = TWO_PAIR;
         continue;
-    } else if (numPairs(numCards, playerHands[winner]) < numPairs(numCards, compareToHand)) {
+    } else if (!hasTwoPairs(numCards, playerHands[winner]) && hasTwoPairs(numCards, compareToHand)) {
+        winningRank = TWO_PAIR;
+        winner = i;
+    } else if (hasOnePair(numCards, playerHands[winner]) && !hasOnePair(numCards, compareToHand)) {
+        winningRank = ONE_PAIR;
+        continue;
+    } else if (!hasOnePair(numCards, playerHands[winner]) && hasOnePair(numCards, compareToHand)) {
+        winningRank = ONE_PAIR;
         winner = i;
     } else if (highestDuplicate(numCards, playerHands[winner]) > highestDuplicate(numCards, compareToHand)) {
+        winningRank = ONE_PAIR;
         continue;
-    } else if (highestDuplicate(numCards, playerHands[winner]) == highestDuplicate(numCards, compareToHand)) {
+    } else if (highestDuplicate(numCards, playerHands[winner]) != 0 && highestDuplicate(numCards, playerHands[winner]) == highestDuplicate(numCards, compareToHand)) {
+        winningRank = ONE_PAIR;
         printf("TIE ON HIGHEST DUPLICATE\n");
     } else if (highestDuplicate(numCards, playerHands[winner]) < highestDuplicate(numCards, compareToHand)) {
         winner = i;
-    } else if (highestValue(numCards, compareToHand) > highestValue(numCards, compareToHand)) {
+    } else if (highestValue(numCards, playerHands[winner]) > highestValue(numCards, compareToHand)) {
+        winningRank = HIGH_CARD;
         continue;
-    } else if (highestValue(numCards, compareToHand) < highestValue(numCards, compareToHand)) {
-        winner = i;
+    } else if (highestValue(numCards, playerHands[winner]) < highestValue(numCards, compareToHand)) {
+      winningRank = HIGH_CARD;
+      winner = i;
     } else {
-        printf("BOH!\n");
+        winningRank = HIGH_CARD;
+        printf("TIE ON HIGHEST VALUE!\n");
     }
   }
 
+  /* Check for ties */
+  int winners[numPlayers];
+  getAllWinningHands(winner, numPlayers, numCards, winners, winningRank, playerHands);
+
   /* Winner determined, check for ties */
-  rankHands(numPlayers, numCards, playerHands, winner);
-
+  rankHands(numPlayers, numCards, playerHands, winners);
 }
 
-void generateTestHand(struct Card playerHand[5]) {
-  for(int i = 0; i < 5; i++) {
-    struct Card card = { .suit = DIAMOND_SYMBOL, .rank = (i + 2) + '0', .rankValue = i + 2 };
-    playerHand[i] = card;
+void getAllWinningHands(int winner, int numPlayers, int numCards,
+  int winners[numPlayers], enum handRanks winningRank,
+  struct Card playerHands[numPlayers][numCards]) {
+  int winnerCount = 0;
+  winners[winnerCount++] = winner;
+
+  if(winningRank == STRAIGHT_FLUSH) {
+    for(int compareToHand = 0; compareToHand < numPlayers; compareToHand++) {
+      if (winner == compareToHand) {
+        continue;
+      }
+      if (hasStraight(numCards, playerHands[compareToHand]) && hasFlush(numCards, playerHands[compareToHand])) {
+        winners[winnerCount++] = compareToHand;
+      }
+    }
+  } else if(winningRank == FOUR_OF_A_KIND) {
+    for(int compareToHand = 0; compareToHand < numPlayers; compareToHand++) {
+      if (winner == compareToHand) {
+        continue;
+      }
+      if (hasFourOfAKind(numCards, playerHands[compareToHand])) {
+        winners[winnerCount++] = compareToHand;
+      }
+    }
+  } else if(winningRank == FULL_HOUSE) {
+    for(int compareToHand = 0; compareToHand < numPlayers; compareToHand++) {
+      if (winner == compareToHand) {
+        continue;
+      }
+      if (hasFullHouse(numCards, playerHands[compareToHand])) {
+        winners[winnerCount++] = compareToHand;
+      }
+    }
+  } else if(winningRank == FLUSH) {
+    for(int compareToHand = 0; compareToHand < numPlayers; compareToHand++) {
+      if (winner == compareToHand) {
+        continue;
+      }
+      if (hasFlush(numCards, playerHands[compareToHand])) {
+        winners[winnerCount++] = compareToHand;
+      }
+    }
+  } else if(winningRank == STRAIGHT) {
+    for(int compareToHand = 0; compareToHand < numPlayers; compareToHand++) {
+      if (winner == compareToHand) {
+        continue;
+      }
+      if (hasStraight(numCards, playerHands[compareToHand])) {
+        winners[winnerCount++] = compareToHand;
+      }
+    }
+  } else if(winningRank == TRIPLET) {
+    for(int compareToHand = 0; compareToHand < numPlayers; compareToHand++) {
+      if (winner == compareToHand) {
+        continue;
+      }
+      if (hasTriplet(numCards, playerHands[compareToHand])) {
+        winners[winnerCount++] = compareToHand;
+      }
+    }
+  } else if(winningRank == TWO_PAIR) {
+    for(int compareToHand = 0; compareToHand < numPlayers; compareToHand++) {
+      if (winner == compareToHand) {
+        continue;
+      }
+      if (hasTwoPairs(numCards, playerHands[compareToHand])) {
+        winners[winnerCount++] = compareToHand;
+      }
+    }
+  } else if(winningRank == ONE_PAIR) {
+    for(int compareToHand = 0; compareToHand < numPlayers; compareToHand++) {
+      if (winner == compareToHand) {
+        continue;
+      }
+      if (hasOnePair(numCards, playerHands[compareToHand])) {
+        winners[winnerCount++] = compareToHand;
+      }
+    }
   }
-}
 
-void testRankings(struct Card playerHands[TEST_HANDS][TEST_CARDS]) {
-  /* High Card */
-  generateTestHand(playerHands[0]);
-  playerHands[0][4].rank++;
-  playerHands[0][4].rankValue++;
-  playerHands[0][4].suit = SPADE_SYMBOL;
+  // Replace the remaining winners with -1
+  for(int i = winnerCount; i < numPlayers; i++) {
+    winners[i] = -1;
+  }
 
-  /* One Pair */
-  generateTestHand(playerHands[1]);
-  playerHands[1][4].rank--;
-  playerHands[1][4].rankValue--;
-  playerHands[1][4].suit = SPADE_SYMBOL;
-
-  /* Two Pairs */
-  generateTestHand(playerHands[2]);
-  playerHands[2][0].rank++;
-  playerHands[2][0].rankValue++;
-  playerHands[2][0].suit = SPADE_SYMBOL;
-
-  playerHands[2][4].rank--;
-  playerHands[2][4].rankValue--;
-  playerHands[2][4].suit = SPADE_SYMBOL;
-
-  /* Triplet */
-  generateTestHand(playerHands[3]);
-  playerHands[3][0].rank++;
-  playerHands[3][0].rankValue++;
-  playerHands[3][0].suit = SPADE_SYMBOL;
-
-  playerHands[3][2].rank--;
-  playerHands[3][2].rankValue--;
-  playerHands[3][2].suit = HEART_SYMBOL;
-
-  /* Straight */
-  generateTestHand(playerHands[4]);
-  playerHands[4][4].suit = SPADE_SYMBOL;
-
-  /* Flush */
-  generateTestHand(playerHands[5]);
-  playerHands[5][4].rankValue++;
-  playerHands[5][4].rank++;
-
-  /* Full House */
-  generateTestHand(playerHands[6]);
-  playerHands[6][0].rank++;
-  playerHands[6][0].rankValue++;
-  playerHands[6][0].suit = SPADE_SYMBOL;
-
-  playerHands[6][2].rank--;
-  playerHands[6][2].rankValue--;
-  playerHands[6][2].suit = HEART_SYMBOL;
-
-  playerHands[6][4].rank--;
-  playerHands[6][4].rankValue--;
-  playerHands[6][4].suit = HEART_SYMBOL;
-
-  /* Four of a Kind */
-  generateTestHand(playerHands[7]);
-  playerHands[7][0].rank++;
-  playerHands[7][0].rankValue++;
-  playerHands[7][0].suit = SPADE_SYMBOL;
-
-  playerHands[7][2].rank--;
-  playerHands[7][2].rankValue--;
-  playerHands[7][2].suit = HEART_SYMBOL;
-
-  playerHands[7][3].rank = playerHands[7][2].rank;
-  playerHands[7][3].rankValue = playerHands[7][2].rankValue;
-  playerHands[7][3].suit = CLUB_SYMBOL;
-
-  /* Straight Flush */
-  generateTestHand(playerHands[8]);
 }
