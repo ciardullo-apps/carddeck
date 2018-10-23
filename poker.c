@@ -55,9 +55,9 @@ void rankHands(int numPlayers, int numCards,
       printf("- Straight");
     } else if (hasTriplet(numCards, playerHands[playerNum])) {
       printf("- Triplet");
-    } else if (numPairs(numCards, playerHands[playerNum]) == 2) {
+    } else if (hasTwoPairs(numCards, playerHands[playerNum])) {
       printf("- Two Pairs");
-    } else if (numPairs(numCards, playerHands[playerNum]) == 1) {
+    } else if (hasOnePair(numCards, playerHands[playerNum])) {
       printf("- One Pair");
     } else {
       printf("- High Card");
