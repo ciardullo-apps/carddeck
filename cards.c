@@ -107,7 +107,7 @@ int main(int argc, char *argv[]) {
   rankHands(params->numPlayers, params->numCards, playerHands, NULL);
 
   printf("\nPlayer Hands: winner(s)\n");
-  determineWinner(params->numPlayers, params->numCards, playerHands);
+  determineWinningHand(params->numPlayers, params->numCards, playerHands);
 
   printf("\nPoker Hands: test\n");
   // struct Card testHands[TEST_HANDS][TEST_CARDS];

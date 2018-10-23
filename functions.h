@@ -29,7 +29,7 @@ void sortHands(int numPlayers, int numCards,
 void rankHands(int numPlayers, int numCards,
   struct Card playerHands[numPlayers][numCards], int* winner);
 
-void determineWinner(int numPlayers, int numCards,
+void determineWinningHand(int numPlayers, int numCards,
   struct Card playerHands[numPlayers][numCards]);
 
 void testRankings(struct Card playerHands[TEST_HANDS][TEST_CARDS]);
