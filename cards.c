@@ -1,7 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h> /* needed for random seed */
-#include "defs.h"
 #include "functions.h"
 
 struct Card * initializeDeck() {
@@ -110,7 +106,5 @@ int main(int argc, char *argv[]) {
   determineWinningHand(params->numPlayers, params->numCards, playerHands);
 
   printf("\nPoker Hands: test\n");
-  // struct Card testHands[TEST_HANDS][TEST_CARDS];
-  // testRankings(testHands);
   rankHands(TEST_HANDS, TEST_CARDS, testHands, NULL);
 }

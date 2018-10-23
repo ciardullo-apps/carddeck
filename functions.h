@@ -1,3 +1,8 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h> /* needed for random seed */
+#include "defs.h"
+
 struct Card {
   const char* suit;
   char rank;

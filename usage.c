@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include "defs.h"
 #include "functions.h"
 
 const int MIN_CARDS = 5;
