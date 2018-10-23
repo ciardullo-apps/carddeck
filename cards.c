@@ -100,11 +100,13 @@ int main(int argc, char *argv[]) {
   printPlayerHands(params->numPlayers, params->numCards, playerHands);
 
   printf("\nPlayer Hands: ranked\n");
-  rankHands(params->numPlayers, params->numCards, playerHands, NULL);
+  rankHands(params->numPlayers, params->numCards, playerHands);
 
   printf("\nPlayer Hands: winner(s)\n");
-  determineWinningHand(params->numPlayers, params->numCards, playerHands);
+  enum handRanks winningHandRank =
+      determineWinningHand(params->numPlayers, params->numCards, playerHands);
+  getAllWinningHands(params->numPlayers, params->numCards, winningHandRank, playerHands);
 
   printf("\nPoker Hands: test\n");
-  rankHands(TEST_HANDS, TEST_CARDS, testHands, NULL);
+  rankHands(TEST_HANDS, TEST_CARDS, testHands);
 }

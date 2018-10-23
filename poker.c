@@ -10,8 +10,6 @@ int hasStraight(int numCards, struct Card playerCards[numCards]);
 int hasFlush(int numCards, struct Card playerCards[numCards]);
 int hasFullHouse(int numCards, struct Card playerCards[numCards]);
 int hasFourOfAKind(int numCards, struct Card playerCards[numCards]);
-void getAllWinningHands(int numPlayers, int numCards, int winners[numPlayers],
-  enum handRanks winningRank, struct Card playerHands[numPlayers][numCards]);
 
 /* Sort each player hand by rank using Bubble sort */
 void sortHands(int numPlayers, int numCards, struct Card playerHands[numPlayers][numCards]) {
@@ -33,44 +31,38 @@ void sortHands(int numPlayers, int numCards, struct Card playerHands[numPlayers]
   }
 }
 
+void rankHand(int playerNum, int numCards, struct Card hand[numCards]) {
+  printf("Player %d] -\t", playerNum + 1);
+  for(int cardNum = 0; cardNum < numCards; cardNum++) {
+    struct Card card = hand[cardNum];
+    printf("[%c-%s]\t", card.rank, card.suit);
+  }
+
+  if (hasStraight(numCards, hand) && hasFlush(numCards, hand)) {
+    printf("- Straight Flush");
+  } else if (hasFourOfAKind(numCards, hand)) {
+    printf("- Four Of A Kind");
+  } else if (hasFullHouse(numCards, hand)) {
+    printf("- Full House");
+  } else if (hasFlush(numCards, hand)) {
+    printf("- Flush");
+  } else if (hasStraight(numCards, hand)) {
+    printf("- Straight");
+  } else if (hasTriplet(numCards, hand)) {
+    printf("- Triplet");
+  } else if (hasTwoPairs(numCards, hand)) {
+    printf("- Two Pairs");
+  } else if (hasOnePair(numCards, hand)) {
+    printf("- One Pair");
+  } else {
+    printf("- High Card");
+  }
+}
+
 void rankHands(int numPlayers, int numCards,
-  struct Card playerHands[numPlayers][numCards], int *winners) {
+  struct Card playerHands[numPlayers][numCards]) {
   for(int playerNum = 0; playerNum < numPlayers; playerNum++) {
-    printf("Player %d] -\t", playerNum + 1);
-    for(int cardNum = 0; cardNum < numCards; cardNum++) {
-      struct Card card = playerHands[playerNum][cardNum];
-      printf("[%c-%s]\t", card.rank, card.suit);
-    }
-    if (0) {
-      ;
-    } else if (hasStraight(numCards, playerHands[playerNum]) && hasFlush(numCards, playerHands[playerNum])) {
-      printf("- Straight Flush");
-    } else if (hasFourOfAKind(numCards, playerHands[playerNum])) {
-      printf("- Four Of A Kind");
-    } else if (hasFullHouse(numCards, playerHands[playerNum])) {
-      printf("- Full House");
-    } else if (hasFlush(numCards, playerHands[playerNum])) {
-      printf("- Flush");
-    } else if (hasStraight(numCards, playerHands[playerNum])) {
-      printf("- Straight");
-    } else if (hasTriplet(numCards, playerHands[playerNum])) {
-      printf("- Triplet");
-    } else if (hasTwoPairs(numCards, playerHands[playerNum])) {
-      printf("- Two Pairs");
-    } else if (hasOnePair(numCards, playerHands[playerNum])) {
-      printf("- One Pair");
-    } else {
-      printf("- High Card");
-    }
-
-    if (winners != NULL) {
-      for(int i = 0; i < numPlayers; i++) {
-        if (playerNum == winners[i]) {
-          printf(" - Winner");
-        }
-      }
-    }
-
+    rankHand(playerNum, numCards, playerHands[playerNum]);
     printf("\n");
   }
 }
@@ -179,7 +171,8 @@ int hasFourOfAKind(int numCards, struct Card playerCards[numCards]) {
         return FALSE;
 }
 
-void determineWinningHand(int numPlayers, int numCards, struct Card playerHands[numPlayers][numCards]) {
+enum handRanks determineWinningHand(int numPlayers, int numCards,
+  struct Card playerHands[numPlayers][numCards]) {
   enum handRanks winningRank = HIGH_CARD;
 
   for(int i = 0; i < numPlayers; i++) {
@@ -203,58 +196,50 @@ void determineWinningHand(int numPlayers, int numCards, struct Card playerHands[
     }
   }
 
-  /* Check for ties */
-  int winners[numPlayers];
-  getAllWinningHands(numPlayers, numCards, winners, winningRank, playerHands);
-
-  /* Winner determined, display all hands indicating all winning hands */
-  rankHands(numPlayers, numCards, playerHands, winners);
+  return winningRank;
 }
 
-void getAllWinningHands(int numPlayers, int numCards, int winners[numPlayers],
-  enum handRanks winningRank, struct Card playerHands[numPlayers][numCards]) {
-  int winnerCount = 0;
+void getAllWinningHands(int numPlayers, int numCards, enum handRanks winningRank,
+    struct Card playerHands[numPlayers][numCards]) {
   for(int hand = 0; hand < numPlayers; hand++) {
+    // Print each hand and rank
+    rankHand(hand, numCards, playerHands[hand]);
+
     if(winningRank == STRAIGHT_FLUSH) {
       if (hasStraight(numCards, playerHands[hand]) && hasFlush(numCards, playerHands[hand])) {
-        winners[winnerCount++] = hand;
+        printf(" - Winner");
       }
     } else if(winningRank == FOUR_OF_A_KIND) {
       if (hasFourOfAKind(numCards, playerHands[hand])) {
-        winners[winnerCount++] = hand;
+        printf(" - Winner");
       }
     } else if(winningRank == FULL_HOUSE) {
       if (hasFullHouse(numCards, playerHands[hand])) {
-        winners[winnerCount++] = hand;
+        printf(" - Winner");
       }
     } else if(winningRank == FLUSH) {
       if (hasFlush(numCards, playerHands[hand])) {
-        winners[winnerCount++] = hand;
+        printf(" - Winner");
       }
     } else if(winningRank == STRAIGHT) {
       if (hasStraight(numCards, playerHands[hand])) {
-        winners[winnerCount++] = hand;
+        printf(" - Winner");
       }
     } else if(winningRank == TRIPLET) {
       if (hasTriplet(numCards, playerHands[hand])) {
-        winners[winnerCount++] = hand;
+        printf(" - Winner");
       }
     } else if(winningRank == TWO_PAIR) {
       if (hasTwoPairs(numCards, playerHands[hand])) {
-        winners[winnerCount++] = hand;
+        printf(" - Winner");
       }
     } else if(winningRank == ONE_PAIR) {
       if (hasOnePair(numCards, playerHands[hand])) {
-        winners[winnerCount++] = hand;
+        printf(" - Winner");
       }
     } else {
-      winners[winnerCount++] = hand;
+      printf(" - Winner");
     }
+    puts("");
   }
-
-  // Replace the remaining winners with -1
-  for(; winnerCount < numPlayers; winnerCount++) {
-    winners[winnerCount] = -1;
-  }
-
 }
